@@ -1079,30 +1079,37 @@
     function setPose(side, pose) {
       const { animal, sprite, fallback } = getSideElements(side);
       if (!animal) return;
-      const key = `${animal.id}_${pose}`;
-      if (failedAssets.has(key)) {
-        sprite.classList.add("hidden");
-        fallback.hidden = false;
-        fallback.textContent = `${animal.name}\n(${pose})`;
-      } else {
-        sprite.classList.remove("hidden");
-        fallback.hidden = true;
-        const cached = assetCache[animal.id]?.[pose];
-        if (cached && cached.src) {
-          sprite.src = cached.src;
-        } else {
-          sprite.src = `./assets/${animal.id}_${pose}.png`;
-        }
-        sprite.alt = `${animal.name} ${pose}`;
-      }
-      if (pose === "death") {
-        sprite.classList.add("ko");
-      } else {
-        sprite.classList.remove("ko");
-      }
-      const stance = side === "left" ? elements.leftStance : elements.rightStance;
-      stance.classList.toggle("ko-left", pose === "death" && side === "left");
-      stance.classList.toggle("ko-right", pose === "death" && side === "right");
+const key = `${animal.id}_${pose}`;
+
+// Always attempt to load the image now, even if the preloader once failed.
+sprite.classList.remove("hidden");
+fallback.hidden = true;
+
+const url = `./assets/${animal.id}_${pose}.png`;
+sprite.alt = `${animal.name} ${pose}`;
+
+// If this specific <img> fails at runtime, show fallback for this attempt only.
+sprite.onerror = () => {
+  sprite.onerror = null; // avoid loops
+  sprite.classList.add("hidden");
+  fallback.hidden = false;
+  fallback.textContent = `${animal.name}\n(${pose})`;
+};
+
+// Prefer preloaded src if present; else use the URL directly.
+const cached = assetCache[animal.id]?.[pose];
+sprite.src = (cached && cached.src) ? cached.src : url;
+
+// KO styling
+if (pose === "death") {
+  sprite.classList.add("ko");
+} else {
+  sprite.classList.remove("ko");
+}
+const stance = side === "left" ? elements.leftStance : elements.rightStance;
+stance.classList.toggle("ko-left", pose === "death" && side === "left");
+stance.classList.toggle("ko-right", pose === "death" && side === "right");
+
     }
 
     function getSideElements(side) {
