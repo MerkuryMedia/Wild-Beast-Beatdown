@@ -625,6 +625,8 @@
     .sprite-fallback[hidden] {
       display: none !important;
     }
+    [hidden] {display: none !important;
+    }
   </style>
 </head>
 <body>
@@ -824,16 +826,28 @@
       restoreBalance();
       updateDevPanel();
       preloadAssets().then(() => {
-        elements.loadingOverlay.classList.add("hidden");
-        state.locked = true;
-        elements.game.classList.remove("hidden");
-        setStatus("Pairing fighters…");
-        updateRoundDisplay();
-        updateBalanceDisplay();
-        state.round = 1;
-        newPairing();
+      hideOverlay(); // new helper below
+      state.locked = true;
+      elements.game.classList.remove("hidden");
+      setStatus("Pairing fighters…");
+      updateRoundDisplay();
+      updateBalanceDisplay();
+      state.round = 1;
+      newPairing();
       });
-    }
+
+// Put this helper near your other functions
+function hideOverlay() {
+  const el = elements.loadingOverlay;
+  if (!el) return;
+  // Belt-and-suspenders: class, attribute, inline style, then remove
+  el.classList.add("hidden");
+  el.setAttribute("hidden", "");
+  el.style.display = "none";
+  // Remove from DOM after a tick so CSS transitions (if any) don’t choke
+  setTimeout(() => { try { el.remove(); } catch(_){} }, 0);
+}
+
 
     function attachEventListeners() {
       elements.pickLeft.addEventListener("change", () => handlePickChange("left"));
