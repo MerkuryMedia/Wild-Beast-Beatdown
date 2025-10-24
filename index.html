@@ -114,10 +114,10 @@
 
     .sprite-shell {
       position: relative;
-      width: clamp(200px, 40vw, 300px);
-      aspect-ratio: 1 / 1;
+      height: clamp(260px, 38vw, 420px);
+      width: min(44vw, 420px);
       display: flex;
-      align-items: center;
+      align-items: flex-end;
       justify-content: center;
     }
 
@@ -169,9 +169,9 @@
 
     img.sprite {
       width: auto;
-      height: auto;
+      height: 100%;
       object-fit: contain;
-      object-position: center bottom;
+      object-position: bottom center;
       display: block;
       image-rendering: crisp-edges;
       user-select: none;
@@ -563,8 +563,8 @@
 
     @media (max-width: 860px) {
       .arena {
-        grid-template-columns: 1fr;
-        padding-inline: clamp(1.25rem, 8vw, 2rem);
+        grid-template-columns: 1fr 24px 1fr;
+        gap: clamp(6px, 1.2vw, 16px);
       }
 
       .versus {
